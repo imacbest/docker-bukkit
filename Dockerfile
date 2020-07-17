@@ -28,8 +28,6 @@ RUN wget -O /minecraft/BuildTools.jar https://hub.spigotmc.org/jenkins/job/Build
 CMD git config --global --unset core.autocrlf
 RUN java -jar BuildTools.jar --rev $BUKKIT_VERSION  2>&1 /dev/null
 
-RUN cd /minecraft && ls
-
 FROM openjdk:8-alpine
 # frolvlad/alpine-python3
 RUN apk add --no-cache python3 bash && \
@@ -40,11 +38,10 @@ RUN apk add --no-cache python3 bash && \
     if [[ ! -e /usr/bin/python ]]; then ln -sf /usr/bin/python3 /usr/bin/python; fi && \
     rm -r /root/.cache
 WORKDIR /root
-COPY --from=builder /minecraft/craftbukkit-*.jar /root/craftbukkit.jar
 COPY --from=builder /minecraft/spigot-*.jar /root/spigot.jar
 EXPOSE 25565
 WORKDIR /data
 ADD entrypoint.sh /root/entrypoint.sh
 ADD configure.py /root/configure.py
 ENTRYPOINT ["/root/entrypoint.sh"]
-CMD ["craftbukkit"]
+CMD ["spigot"]
